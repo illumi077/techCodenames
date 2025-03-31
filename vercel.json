@@ -1,0 +1,9 @@
+{
+    "rewrites": [
+      { "source": "/room/:path*", "destination": "/index.html" },
+      { "source": "/createRoom", "destination": "/index.html" },
+      { "source": "/joinRoom", "destination": "/index.html" },
+      { "source": "/:path*", "destination": "/index.html" }
+    ]
+  }
+  

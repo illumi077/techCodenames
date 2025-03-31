@@ -180,3 +180,13 @@
   transform: scale(1.05);
   box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.5);
 }
+.revealed {
+  background-color: #b0b0b0; /* Grey or any subdued color */
+  color: transparent; /* Hides the text */
+  pointer-events: none; /* Prevent further clicks */
+  transition: all 0.2s ease; /* Smooth transition for color change */
+}
+.revealed:hover {
+  color: #000; /* Temporarily show text */
+}
+

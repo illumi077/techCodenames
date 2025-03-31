@@ -1,50 +1,46 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import io from 'socket.io-client';
-import '../styles/Room.css';
+import React, { useEffect, useState, useCallback } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import io from "socket.io-client";
+import "../styles/Room.css";
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'; // Fallback to localhost if undefined
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000"; // Fallback to localhost
 const socket = io(backendUrl, {
-  transports: ['websocket'], // Enforce WebSocket-only transport
+  transports: ["websocket"], // Enforce WebSocket-only transport
 });
 
 function Room() {
   const { roomCode } = useParams(); // Access roomCode from the URL
   const [roomData, setRoomData] = useState(null); // Store room data
   const [loading, setLoading] = useState(true); // Loading state
-  const [error, setError] = useState(''); // Error state
+  const [error, setError] = useState(""); // Error state
   const [timer, setTimer] = useState(45); // Timer for the current turn
   const navigate = useNavigate();
 
   useEffect(() => {
-    socket.emit('joinRoom', roomCode);
+    socket.emit("joinRoom", roomCode);
 
     const fetchRoomData = async () => {
       try {
         const response = await fetch(`${backendUrl}/api/rooms/${roomCode}`);
         const data = await response.json();
-    
+
         if (response.ok && data.players?.length > 0) {
-          // Ensure the backend response contains valid room data
-          console.log('Fetched Room Data:', data);
+          console.log("Fetched Room Data:", data);
           setRoomData(data); // Update room data
-          setError(''); // Clear any previous errors
+          setError(""); // Clear previous errors
         } else {
-          console.error('Error fetching room details:', data.error);
-          setError(data.error || 'Room not found.');
-          // Delay navigation slightly to allow error messages to display
-          setTimeout(() => navigate('/'), 1000);
+          console.error("Error fetching room details:", data.error);
+          setError(data.error || "Room not found.");
+          setTimeout(() => navigate("/"), 1000); // Redirect after showing error
         }
       } catch (err) {
-        console.error('Fetch Room Data Error:', err);
-        setError('An error occurred while fetching room details.');
-        // Allow retries or display error feedback
-        setTimeout(() => navigate('/'), 1000);
+        console.error("Fetch Room Data Error:", err);
+        setError("An error occurred while fetching room details.");
+        setTimeout(() => navigate("/"), 1000);
       } finally {
         setLoading(false); // Stop loading state
       }
     };
-    
 
     // Fetch data immediately on mount
     fetchRoomData();
@@ -53,14 +49,14 @@ function Room() {
     const interval = setInterval(fetchRoomData, 2000);
 
     // Socket.IO listeners for real-time updates
-    socket.on('updatePlayers', (updatedPlayers) => {
+    socket.on("updatePlayers", (updatedPlayers) => {
       setRoomData((prevRoomData) => ({
         ...prevRoomData,
         players: updatedPlayers,
       }));
     });
 
-    socket.on('updateTile', ({ index }) => {
+    socket.on("updateTile", ({ index }) => {
       setRoomData((prevData) => {
         const updatedRevealedTiles = [...prevData.revealedTiles];
         updatedRevealedTiles[index] = true;
@@ -71,17 +67,17 @@ function Room() {
       });
     });
 
-    socket.on('gameStarted', ({ currentTurnTeam, timerStartTime }) => {
+    socket.on("gameStarted", ({ currentTurnTeam, timerStartTime }) => {
       setRoomData((prevData) => ({
         ...prevData,
         currentTurnTeam,
         timerStartTime,
-        gameState: 'active',
+        gameState: "active",
       }));
       setTimer(45); // Reset timer when the game starts
     });
 
-    socket.on('turnSwitched', ({ currentTurnTeam, timerStartTime }) => {
+    socket.on("turnSwitched", ({ currentTurnTeam, timerStartTime }) => {
       setRoomData((prevData) => ({
         ...prevData,
         currentTurnTeam,
@@ -90,21 +86,21 @@ function Room() {
       setTimer(45); // Reset timer when the turn switches
     });
 
-    socket.on('gameEnded', ({ result }) => {
+    socket.on("gameEnded", ({ result }) => {
       alert(result); // Notify players of the game result
       setRoomData((prevData) => ({
         ...prevData,
-        gameState: 'ended',
+        gameState: "ended",
       }));
     });
 
     // Cleanup listeners and interval on component unmount
     return () => {
-      socket.off('updatePlayers');
-      socket.off('updateTile');
-      socket.off('gameStarted');
-      socket.off('turnSwitched');
-      socket.off('gameEnded');
+      socket.off("updatePlayers");
+      socket.off("updateTile");
+      socket.off("gameStarted");
+      socket.off("turnSwitched");
+      socket.off("gameEnded");
       clearInterval(interval); // Stop periodic fetching
     };
   }, [roomCode, navigate]);
@@ -112,23 +108,23 @@ function Room() {
   const handleEndTurn = useCallback(async () => {
     try {
       const response = await fetch(`${backendUrl}/api/rooms/endTurn`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ roomCode }),
       });
 
       if (!response.ok) {
         const data = await response.json();
-        alert(data.error || 'Failed to end turn.');
+        alert(data.error || "Failed to end turn.");
       }
     } catch (error) {
-      console.error('Error ending turn:', error);
+      console.error("Error ending turn:", error);
     }
   }, [roomCode]);
 
   useEffect(() => {
     // Timer countdown logic
-    if (timer > 0 && roomData?.gameState === 'active') {
+    if (timer > 0 && roomData?.gameState === "active") {
       const countdown = setTimeout(() => setTimer((prev) => prev - 1), 1000);
       return () => clearTimeout(countdown);
     } else if (timer === 0) {
@@ -139,17 +135,17 @@ function Room() {
   const handleStartGame = async () => {
     try {
       const response = await fetch(`${backendUrl}/api/rooms/startGame`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ roomCode }),
       });
 
       if (!response.ok) {
         const data = await response.json();
-        alert(data.error || 'Failed to start the game.');
+        alert(data.error || "Failed to start the game.");
       }
     } catch (error) {
-      console.error('Error starting game:', error);
+      console.error("Error starting game:", error);
     }
   };
 
@@ -157,7 +153,7 @@ function Room() {
     if (
       roomData.currentTurnTeam === currentPlayer.team &&
       !roomData.revealedTiles[index] &&
-      currentPlayer.role !== 'Spymaster'
+      currentPlayer.role !== "Spymaster"
     ) {
       setRoomData((prevData) => {
         const updatedRevealedTiles = [...prevData.revealedTiles];
@@ -168,29 +164,29 @@ function Room() {
         };
       });
 
-      socket.emit('tileRevealed', { roomCode, index });
+      socket.emit("tileRevealed", { roomCode, index });
     }
   };
 
   const handleLeaveRoom = async () => {
-    const username = sessionStorage.getItem('username');
+    const username = sessionStorage.getItem("username");
     try {
       const response = await fetch(`${backendUrl}/api/rooms/leave`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ roomCode, username }),
       });
 
       const data = await response.json();
       if (response.status === 200) {
-        socket.emit('playerLeft', { roomCode, players: data.players });
-        sessionStorage.removeItem('username');
-        navigate('/');
+        socket.emit("playerLeft", { roomCode, players: data.players });
+        sessionStorage.removeItem("username");
+        navigate("/");
       } else {
-        alert(data.error || 'Failed to leave the room.');
+        alert(data.error || "Failed to leave the room.");
       }
     } catch (error) {
-      console.error('Error leaving the room:', error);
+      console.error("Error leaving the room:", error);
     }
   };
 
@@ -203,10 +199,10 @@ function Room() {
   }
 
   const currentPlayer = roomData.players.find(
-    (player) => player.username === sessionStorage.getItem('username')
+    (player) => player.username === sessionStorage.getItem("username")
   );
 
-  const isSpymaster = currentPlayer?.role === 'Spymaster';
+  const isSpymaster = currentPlayer?.role === "Spymaster";
 
   return (
     <div className="room-container">
@@ -241,11 +237,11 @@ function Room() {
 
       <div className="grid">
         {roomData.wordSet.map((word, index) => {
-          const tileClass = isSpymaster
-            ? roomData.patterns[index]
-            : roomData.revealedTiles[index]
-            ? roomData.patterns[index]
-            : "";
+          const tileClass = roomData.revealedTiles[index]
+            ? `revealed ${roomData.patterns[index]}` // Revealed tiles show their color
+            : isSpymaster
+            ? roomData.patterns[index] // Spymasters see all tile colors
+            : ""; // Neutral styling for unrevealed tiles
 
           return (
             <div
@@ -255,7 +251,8 @@ function Room() {
               }`}
               onClick={() => handleTileClick(index)}
             >
-              {word}
+              {roomData.revealedTiles[index] ? "" : word}{" "}
+              {/* Hide text if revealed */}
             </div>
           );
         })}
