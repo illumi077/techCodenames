@@ -1,0 +1,81 @@
+/* Container */
+.player-setup-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #79b168; /* Lush retro green base */
+    background-image: 
+      radial-gradient(circle, #6f9d44 2%, transparent 2%), 
+      radial-gradient(circle, #a67c52 2%, transparent 2%), 
+      radial-gradient(circle, #c2aa70 2%, transparent 2%);
+    background-size: 1.25rem 1.25rem, 1.5625rem 1.5625rem, 1.875rem 1.875rem;
+    background-position: 0 0, 0.625rem 0.625rem, -0.3125rem -0.3125rem;
+    color: white;
+    text-align: center;
+    font-family: 'Press Start 2P', cursive;
+  }
+  
+  /* Title */
+  .player-setup-container h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: white;
+    text-shadow: 0.125rem 0.125rem black;
+  }
+  
+  /* Inputs */
+  .player-setup-container input,
+  .player-setup-container select {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1rem;
+    padding: 0.625rem;
+    margin-bottom: 1rem;
+    border: 0.1875rem solid black;
+    background-color: #a67c52; /* Retro brown */
+    color: white;
+    text-align: center;
+    border-radius: 0.3125rem;
+    width: 18.75rem;
+    outline: none;
+    transition: transform 0.2s, box-shadow 0.2s ease;
+  }
+  
+  /* Input and Select Focus */
+  .player-setup-container input:focus,
+  .player-setup-container select:focus {
+    transform: translateY(-0.0625rem);
+    box-shadow: 0 0.1875rem 0.3125rem rgba(0, 0, 0, 0.5); /* Subtle shadow on focus */
+  }
+  
+  /* Button */
+  .player-setup-container button {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1rem;
+    padding: 0.9375rem 1.875rem;
+    margin-top: 1rem;
+    border: 0.1875rem solid black;
+    background-color: #f9d342; /* Softer retro golden yellow */
+    color: black;
+    cursor: pointer;
+    text-shadow: 0.125rem 0.125rem #ffffff;
+    box-shadow: 0.25rem 0.5rem black;
+    border-radius: 0.3125rem;
+    transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s ease;
+  }
+  
+  /* Button Hover */
+  .player-setup-container button:hover {
+    background-color: #d1345b; /* Retro red-pink on hover */
+    color: white;
+    transform: scale(1.05); /* Slight zoom effect */
+  }
+  
+  /* Button Active (Pressed) */
+  .player-setup-container button:active {
+    transform: translateY(0.125rem); /* Pressed-in effect */
+    box-shadow: 0 0.125rem black; /* Reduced shadow for pressed look */
+    background-color: #f9d342; /* Retain golden yellow on press */
+  }
+  

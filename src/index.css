@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+/* General Reset */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Press Start 2P', cursive;
+  background-color: #79b168; /* Lush green base */
+  background-image: 
+    radial-gradient(circle, #6f9d44 12%, transparent 2%), 
+    radial-gradient(circle, #a67c52 12%, transparent 2%), 
+    radial-gradient(circle, #c2aa70 12%, transparent 2%);
+  background-size: 20px 20px, 25px 25px, 30px 30px;
+  background-position: 0 0, 10px 10px, -5px -5px;
+  color: white;
+  text-align: center;
+}
+
+h1, h2, p {
+  text-shadow: 1px 1px #000; /* Subtle shadow for depth */
+  margin-bottom: 20px;
+}

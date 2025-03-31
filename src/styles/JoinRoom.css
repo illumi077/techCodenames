@@ -1,0 +1,108 @@
+/* Join Room Container */
+.join-room-container {
+  max-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.1rem;
+  align-items: center;
+  padding: 1rem;
+  background-color: #79b168; /* Lush retro green base */
+  background-image: 
+    radial-gradient(circle, #6f9d44 12%, transparent 2%), 
+    radial-gradient(circle, #a67c52 12%, transparent 2%), 
+    radial-gradient(circle, #c2aa70 12%, transparent 2%);
+  background-size: 1.25rem 1.25rem, 1.5625rem 1.5625rem, 1.875rem 1.875rem;
+  background-position: 0 0, 0.625rem 0.625rem, -0.3125rem -0.3125rem;
+  color: white;
+}
+
+/* Title Styling */
+.join-title {
+  font-size: 2rem;
+  margin-bottom: 5.25rem;
+  color: white;
+  text-shadow: 0.0625rem 0.0625rem black; /* Subtle shadow for depth */
+  font-family: 'Press Start 2P', cursive; /* Retro font */
+  text-align: center;
+}
+
+/* Input Fields */
+.retro-input {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 1rem;
+  padding: 0.625rem;
+  margin-bottom: 1.25rem;
+  border: 0.1875rem solid black;
+  background-color: #a67c52; /* Retro brown */
+  color: white;
+  text-align: center;
+  border-radius: 0.3125rem;
+  width: 18.75rem; /* Matches CreateRoom input width */
+  outline: none;
+  transition: transform 0.2s, box-shadow 0.2s ease;
+}
+
+.retro-input:focus {
+  transform: translateY(-0.0625rem); /* Subtle lift */
+  box-shadow: 0 0.1875rem 0.3125rem rgba(0, 0, 0, 0.5); /* Shadow for focus */
+}
+
+/* Button Styles */
+.retro-button {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 1rem;
+  padding: 0.625rem 1.25rem;
+  border: 0.1875rem solid black;
+  background-color: #f9d342; /* Retro golden yellow */
+  color: black;
+  cursor: pointer;
+  border-radius: 0.3125rem;
+  text-shadow: 0.125rem 0.125rem black; /* Adds depth to button text */
+  box-shadow: 0.25rem 0.25rem black;
+  margin-top: 1rem;
+  transition: transform 0.2s, box-shadow 0.2s ease;
+}
+
+.retro-button:hover {
+  transform: translateY(-0.125rem);
+  box-shadow: 0.375rem 0.375rem black;
+  background-color: #d1345b; /* Hover effect with red-pink */
+  color: white;
+}
+
+.retro-button:active {
+  transform: translateY(0.125rem);
+  box-shadow: 0.125rem 0.125rem black;
+}
+
+/* Error Message Styling */
+.error-message {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.875rem;
+  color: #ff5f5f; /* Bright red for errors */
+  text-shadow: 0.0625rem 0.0625rem black;
+  margin-top: 0.625rem;
+  text-align: center;
+}
+
+/* Dropdown Styling */
+select {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 1rem;
+  padding: 0.625rem;
+  margin-bottom: 1.25rem;
+  border: 0.1875rem solid black;
+  background-color: #a67c52; /* Retro brown */
+  color: white;
+  text-align: center;
+  border-radius: 0.3125rem;
+  width: 19rem; /* Matches input width */
+  outline: none;
+  transition: transform 0.2s, box-shadow 0.2s ease;
+}
+
+select:focus {
+  transform: translateY(-0.0625rem); /* Subtle lift */
+  box-shadow: 0 0.1875rem 0.3125rem rgba(0, 0, 0, 0.5); /* Shadow for focus */
+}

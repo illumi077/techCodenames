@@ -1,0 +1,55 @@
+/* Create Room Container */
+.create-room-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #79b168; /* Retro green base */
+  background-image: 
+    radial-gradient(circle, #6f9d44 12%, transparent 2%), 
+    radial-gradient(circle, #a67c52 12%, transparent 2%), 
+    radial-gradient(circle, #c2aa70 12%, transparent 2%);
+  background-size: 1.25rem 1.25rem, 1.5625rem 1.5625rem, 1.875rem 1.875rem;
+  background-position: 0 0, 0.625rem 0.625rem, -0.3125rem -0.3125rem;
+  color: white;
+}
+
+/* Title Styling */
+.create-title {
+  font-size: 2rem; /* Dynamic sizing for title */
+  margin-bottom: 1.25rem; /* Adjusted spacing */
+  color: white;
+  text-shadow: 0.0625rem 0.0625rem black; /* Strong black shadow for depth */
+}
+
+/* Input Styling */
+.retro-input {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 1rem;
+  padding: 0.625rem; /* Adjusted for consistent spacing */
+  margin-bottom: 1.25rem;
+  border: 0.1875rem solid black; /* Rem-based border */
+  background-color: #a67c52; /* Retro brown tone */
+  color: white;
+  text-align: center;
+  outline: none;
+  border-radius: 0.3125rem; /* Rounded corners for modern touch */
+  width: 18.75rem;
+  transition: transform 0.2s, box-shadow 0.2s ease;
+}
+
+.retro-input:focus {
+  transform: translateY(-0.0625rem); /* Subtle lift effect */
+  box-shadow: 0 0.1875rem 0.3125rem rgba(0, 0, 0, 0.5); /* Shadow for focus */
+}
+
+.error-message {
+  color: red;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  font-family: 'Press Start 2P', cursive;
+  text-align: center;
+}
+
+/* Button Styling */

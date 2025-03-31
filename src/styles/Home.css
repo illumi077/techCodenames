@@ -1,0 +1,35 @@
+/* Home Container */
+.home-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  background-color: #79b168; /* Lush retro green background */
+  background-image: 
+    radial-gradient(circle, #6f9d44 12%, transparent 2%), 
+    radial-gradient(circle, #a67c52 12%, transparent 2%), 
+    radial-gradient(circle, #c2aa70 12%, transparent 2%);
+  background-size: 1.25rem 1.25rem, 1.5625rem 1.5625rem, 1.875rem 1.875rem; /* Converted to rem */
+  background-position: 0 0, 0.625rem 0.625rem, -0.3125rem -0.3125rem; /* Converted to rem */
+  color: white;
+}
+
+/* Retro Title */
+.retro-title {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 3rem; /* Title size based on base font */
+  color: white;
+  text-shadow: 0.125rem 0.125rem black; /* Consistent shadow size */
+  margin-bottom: 2.5rem; /* Adjusted spacing */
+}
+
+/* Button Container */
+.retro-buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.25rem; /* Button spacing with rem */
+}
+
+/* Buttons */
