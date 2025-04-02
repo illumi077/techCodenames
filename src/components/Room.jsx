@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { socket } from "../utils/socket"; // Ensure WebSocket connection is centralized
 import "../styles/Room.css";
+import HintDisplay from "./HintDisplay"; // Import the HintDisplay component
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000"; // Fallback to localhost
 
