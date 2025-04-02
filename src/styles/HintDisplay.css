@@ -1,0 +1,20 @@
+.hint-container {
+    margin-top: 10px;
+    padding: 10px;
+    text-align: center;
+  }
+  
+  .hint-input input {
+    padding: 8px;
+    width: 200px;
+  }
+  
+  .hint-message {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #ffcc00;
+    background-color: #222;
+    padding: 5px;
+    border-radius: 5px;
+  }
+  

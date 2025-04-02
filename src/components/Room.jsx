@@ -1,19 +1,16 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import io from "socket.io-client";
+import { socket } from "../utils/socket"; // Ensure WebSocket connection is centralized
 import "../styles/Room.css";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000"; // Fallback to localhost
-const socket = io(backendUrl, {
-  transports: ["websocket"], // Enforce WebSocket-only transport
-});
 
 function Room() {
   const { roomCode } = useParams(); // Access roomCode from the URL
   const [roomData, setRoomData] = useState(null); // Store room data
   const [loading, setLoading] = useState(true); // Loading state
   const [error, setError] = useState(""); // Error state
-  const [timer, setTimer] = useState(45); // Timer for the current turn
+  const [timer, setTimer] = useState(50); // Timer for the current turn
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -74,7 +71,7 @@ function Room() {
         timerStartTime,
         gameState: "active",
       }));
-      setTimer(45); // Reset timer when the game starts
+      setTimer(50); // Reset timer when the game starts
     });
 
     socket.on("turnSwitched", ({ currentTurnTeam, timerStartTime }) => {
@@ -83,7 +80,7 @@ function Room() {
         currentTurnTeam,
         timerStartTime,
       }));
-      setTimer(45); // Reset timer when the turn switches
+      setTimer(50); // Reset timer when the turn switches
     });
 
     socket.on("gameEnded", ({ result }) => {
@@ -220,11 +217,14 @@ function Room() {
 
       {roomData.gameState === "waiting" &&
         currentPlayer.team === "Red" &&
-        currentPlayer.role === "Agent" && (
+        currentPlayer.role === "Spymaster" && (
           <button className="retro-button" onClick={handleStartGame}>
             Start Game
           </button>
         )}
+      {/* {roomData.gameState === "active" && (
+        <HintDisplay roomCode={roomCode} isSpymaster={currentPlayer.role === 'Spymaster'} />
+      )} Hint display for agents */}
 
       <div className="game-info">
         {roomData.gameState === "active" && (
@@ -265,6 +265,7 @@ function Room() {
             End Turn
           </button>
         )}
+      <HintDisplay roomCode={roomCode} isSpymaster={currentPlayer.role === 'Spymaster'} />
 
       <div className="player-list">
         <h3>Players in the Room:</h3>
