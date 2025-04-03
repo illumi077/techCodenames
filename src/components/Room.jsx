@@ -266,7 +266,8 @@ function Room() {
             End Turn
           </button>
         )}
-      <HintDisplay roomCode={roomCode} isSpymaster={currentPlayer.role === 'Spymaster'} />
+      <HintDisplay roomCode={roomCode} currentTurnTeam={roomData.currentTurnTeam} currentPlayer={currentPlayer} />
+
 
       <div className="player-list">
         <h3>Players in the Room:</h3>

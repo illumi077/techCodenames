@@ -1,33 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { socket } from '../utils/socket'; // Ensure WebSocket connection is centralized
-import '../styles/HintDisplay.css'; // Add relevant styles
+import React, { useState, useEffect } from "react";
+import { socket } from "../utils/socket"; // Shared WebSocket instance
+import "../styles/HintDisplay.css";
 
-function HintDisplay({ roomCode, isSpymaster }) {
-  const [hint, setHint] = useState('');
-  const [currentHint, setCurrentHint] = useState('');
+function HintDisplay({ roomCode, currentTurnTeam, currentPlayer }) {
+  const [hint, setHint] = useState("");
+  const [currentHint, setCurrentHint] = useState("");
 
   useEffect(() => {
-    socket.on('newHint', (hint) => {
+    socket.on("newHint", (hint) => {
       setCurrentHint(hint);
     });
 
     return () => {
-      socket.off('newHint');
+      socket.off("newHint");
     };
   }, []);
 
   const handleHintSubmit = () => {
-    if (hint.trim() && isSpymaster) {
-      console.log("Submitting hint from frontend:", { roomCode, hint }); // Debug log
-      socket.emit("submitHint", { roomCode, hint });
-      setHint(""); // Clear input after submission
+    if (hint.trim() && currentPlayer.role === "Spymaster" && currentPlayer.team === currentTurnTeam) {
+      console.log("Submitting hint:", { roomCode, hint, username: currentPlayer.username });
+      socket.emit("submitHint", { roomCode, hint, username: currentPlayer.username });
+      setHint("");
     }
   };
-  
 
   return (
     <div className="hint-container">
-      {isSpymaster && (
+      {currentPlayer.role === "Spymaster" && currentPlayer.team === currentTurnTeam && (
         <div className="hint-input">
           <input
             type="text"
@@ -38,7 +37,7 @@ function HintDisplay({ roomCode, isSpymaster }) {
           <button onClick={handleHintSubmit}>Submit Hint</button>
         </div>
       )}
-      {currentHint && <div className="hint-message">Spymaster Hint: {currentHint}</div>}
+      {currentHint && <div className="hint-message">{currentHint}</div>}
     </div>
   );
 }
