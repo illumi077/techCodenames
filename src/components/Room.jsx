@@ -13,6 +13,15 @@ function Room() {
   const [error, setError] = useState("");
   const [timer, setTimer] = useState(50);
   const navigate = useNavigate();
+  
+  useEffect(() => {
+    if (timer > 0 && roomData?.gameState === "active") {
+      const countdown = setTimeout(() => setTimer((prev) => prev - 1), 999);
+      return () => clearTimeout(countdown);
+    } else if (timer === 0) {
+      socket.emit("timerExpired", roomCode); // **Single emission per cycle**
+    }
+  }, [timer, roomData, roomCode]);
 
   useEffect(() => {
     socket.emit("joinRoom", roomCode);
@@ -39,6 +48,7 @@ function Room() {
         setLoading(false);
       }
     };
+    
 
     fetchRoomData();
     const interval = setInterval(fetchRoomData, 2000);
