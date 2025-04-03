@@ -37,7 +37,7 @@ function HintDisplay({ roomCode, currentTurnTeam, currentPlayer }) {
           <button onClick={handleHintSubmit}>Submit Hint</button>
         </div>
       )}
-      {currentHint && <div className="hint-message">{currentHint}</div>}
+      {currentHint && <div className="hint-message">`${currentPlayer}'s hint:'`{currentHint}</div>}
     </div>
   );
 }
