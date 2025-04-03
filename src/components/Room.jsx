@@ -32,7 +32,7 @@ function Room() {
         const data = await response.json();
 
         if (response.ok && data.players?.length > 0) {
-          console.log("Fetched Room Data:", data);
+          // console.log("Fetched Room Data:", data);
           setRoomData(data);
           setError("");
         } else {
@@ -70,7 +70,22 @@ function Room() {
         };
       });
     });
-
+    socket.on("gamePaused", ({ message }) => {
+      alert(message);
+      setRoomData((prevData) => ({
+        ...prevData,
+        gameState: "paused",
+      }));
+    });
+    
+    socket.on("gameResumed", ({ message }) => {
+      alert(message);
+      setRoomData((prevData) => ({
+        ...prevData,
+        gameState: "active",
+      }));
+    });
+    
     socket.on("gameStarted", ({ currentTurnTeam, timerStartTime }) => {
       setRoomData((prevData) => ({
         ...prevData,
