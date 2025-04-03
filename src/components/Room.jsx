@@ -22,6 +22,16 @@ function Room() {
       socket.emit("timerExpired", roomCode); // **Single emission per cycle**
     }
   }, [timer, roomData, roomCode]);
+  useEffect(() => {
+    socket.on("gameStartFailed", ({ message }) => {
+      alert(message);
+    });
+  
+    return () => {
+      socket.off("gameStartFailed"); // Cleanup listener
+    };
+  }, []);
+  
 
   useEffect(() => {
     socket.emit("joinRoom", roomCode);
