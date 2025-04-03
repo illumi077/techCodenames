@@ -40,14 +40,14 @@ function HintDisplay({ roomCode, currentTurnTeam, currentPlayer }) {
     <div className="hint-container">
       {currentPlayer.role === "Spymaster" &&
         currentPlayer.team === currentTurnTeam && (
-          <div className="hint-input">
+          <div className="retro-input">
             <input
               type="text"
               value={hint}
               onChange={(e) => setHint(e.target.value)}
               placeholder="Enter your hint..."
             />
-            <button onClick={handleHintSubmit}>Submit Hint</button>
+            <button className="retro-button" onClick={handleHintSubmit}>Submit Hint</button>
           </div>
         )}
       {currentHint && (
