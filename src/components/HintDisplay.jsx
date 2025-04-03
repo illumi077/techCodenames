@@ -17,11 +17,13 @@ function HintDisplay({ roomCode, isSpymaster }) {
   }, []);
 
   const handleHintSubmit = () => {
-    if (hint.trim()) {
-      socket.emit('submitHint', { roomCode, hint });
-      setHint('');
+    if (hint.trim() && isSpymaster) {
+      console.log("Submitting hint from frontend:", { roomCode, hint }); // Debug log
+      socket.emit("submitHint", { roomCode, hint });
+      setHint(""); // Clear input after submission
     }
   };
+  
 
   return (
     <div className="hint-container">
