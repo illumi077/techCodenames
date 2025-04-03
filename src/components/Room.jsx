@@ -1,17 +1,17 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { socket } from "../utils/socket"; // Ensure WebSocket connection is centralized
+import { socket } from "../utils/socket";
 import "../styles/Room.css";
-import HintDisplay from "./HintDisplay"; // Import the HintDisplay component
+import HintDisplay from "./HintDisplay";
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000"; // Fallback to localhost
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 function Room() {
-  const { roomCode } = useParams(); // Access roomCode from the URL
-  const [roomData, setRoomData] = useState(null); // Store room data
-  const [loading, setLoading] = useState(true); // Loading state
-  const [error, setError] = useState(""); // Error state
-  const [timer, setTimer] = useState(50); // Timer for the current turn
+  const { roomCode } = useParams();
+  const [roomData, setRoomData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [timer, setTimer] = useState(50);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,29 +24,25 @@ function Room() {
 
         if (response.ok && data.players?.length > 0) {
           console.log("Fetched Room Data:", data);
-          setRoomData(data); // Update room data
-          setError(""); // Clear previous errors
+          setRoomData(data);
+          setError("");
         } else {
           console.error("Error fetching room details:", data.error);
           setError(data.error || "Room not found.");
-          setTimeout(() => navigate("/"), 1000); // Redirect after showing error
+          setTimeout(() => navigate("/"), 1000);
         }
       } catch (err) {
         console.error("Fetch Room Data Error:", err);
         setError("An error occurred while fetching room details.");
         setTimeout(() => navigate("/"), 1000);
       } finally {
-        setLoading(false); // Stop loading state
+        setLoading(false);
       }
     };
 
-    // Fetch data immediately on mount
     fetchRoomData();
-
-    // Set up periodic polling every 2 seconds
     const interval = setInterval(fetchRoomData, 2000);
 
-    // Socket.IO listeners for real-time updates
     socket.on("updatePlayers", (updatedPlayers) => {
       setRoomData((prevRoomData) => ({
         ...prevRoomData,
@@ -72,7 +68,7 @@ function Room() {
         timerStartTime,
         gameState: "active",
       }));
-      setTimer(50); // Reset timer when the game starts
+      setTimer(50);
     });
 
     socket.on("turnSwitched", ({ currentTurnTeam, timerStartTime }) => {
@@ -81,71 +77,26 @@ function Room() {
         currentTurnTeam,
         timerStartTime,
       }));
-      setTimer(50); // Reset timer when the turn switches
+      setTimer(50);
     });
 
     socket.on("gameEnded", ({ result }) => {
-      alert(result); // Notify players of the game result
+      alert(result);
       setRoomData((prevData) => ({
         ...prevData,
         gameState: "ended",
       }));
     });
 
-    // Cleanup listeners and interval on component unmount
     return () => {
       socket.off("updatePlayers");
       socket.off("updateTile");
       socket.off("gameStarted");
       socket.off("turnSwitched");
       socket.off("gameEnded");
-      clearInterval(interval); // Stop periodic fetching
+      clearInterval(interval);
     };
   }, [roomCode, navigate]);
-
-  const handleEndTurn = useCallback(async () => {
-    try {
-      const response = await fetch(`${backendUrl}/api/rooms/endTurn`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ roomCode }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        alert(data.error || "Failed to end turn.");
-      }
-    } catch (error) {
-      console.error("Error ending turn:", error);
-    }
-  }, [roomCode]);
-
-  useEffect(() => {
-    // Timer countdown logic
-    if (timer > 0 && roomData?.gameState === "active") {
-      const countdown = setTimeout(() => setTimer((prev) => prev - 1), 1000);
-      return () => clearTimeout(countdown);
-    } else if (timer === 0) {
-      handleEndTurn(); // Automatically end the turn when the timer runs out
-    }
-  }, [timer, roomData, handleEndTurn]);
-
-  const handleStartGame = async () => {
-    try {
-      const response = await fetch(`${backendUrl}/api/rooms/startGame`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ roomCode }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        alert(data.error || "Failed to start the game.");
-      }
-    } catch (error) {
-      console.error("Error starting game:", error);
-    }
-  };
 
   const handleTileClick = (index) => {
     if (
@@ -162,7 +113,23 @@ function Room() {
         };
       });
 
-      socket.emit("tileRevealed", { roomCode, index });
+      socket.emit("tileClicked", { roomCode, index });
+    }
+  };
+  const handleStartGame = async () => {
+    try {
+      const response = await fetch(`${backendUrl}/api/rooms/startGame`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ roomCode }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        alert(data.error || "Failed to start the game.");
+      }
+    } catch (error) {
+      console.error("Error starting game:", error);
     }
   };
 
@@ -188,13 +155,8 @@ function Room() {
     }
   };
 
-  if (loading) {
-    return <div className="loading">Loading room details...</div>;
-  }
-
-  if (error) {
-    return <div className="error-message">{error}</div>;
-  }
+  if (loading) return <div className="loading">Loading room details...</div>;
+  if (error) return <div className="error-message">{error}</div>;
 
   const currentPlayer = roomData.players.find(
     (player) => player.username === sessionStorage.getItem("username")
@@ -223,9 +185,6 @@ function Room() {
             Start Game
           </button>
         )}
-      {/* {roomData.gameState === "active" && (
-        <HintDisplay roomCode={roomCode} isSpymaster={currentPlayer.role === 'Spymaster'} />
-      )} Hint display for agents */}
 
       <div className="game-info">
         {roomData.gameState === "active" && (
@@ -239,10 +198,10 @@ function Room() {
       <div className="grid">
         {roomData.wordSet.map((word, index) => {
           const tileClass = roomData.revealedTiles[index]
-            ? `revealed ${roomData.patterns[index]}` // Revealed tiles show their color
+            ? `revealed ${roomData.patterns[index]}`
             : isSpymaster
-            ? roomData.patterns[index] // Spymasters see all tile colors
-            : ""; // Neutral styling for unrevealed tiles
+            ? roomData.patterns[index]
+            : "";
 
           return (
             <div
@@ -252,33 +211,25 @@ function Room() {
               }`}
               onClick={() => handleTileClick(index)}
             >
-              {roomData.revealedTiles[index] ? "" : word}{" "}
-              {/* Hide text if revealed */}
+              {roomData.revealedTiles[index] ? "" : word}
             </div>
           );
         })}
       </div>
 
-      {roomData.gameState === "active" &&
-        roomData.currentTurnTeam === currentPlayer.team &&
-        currentPlayer.role === "Agent" && (
-          <button className="retro-button" onClick={handleEndTurn}>
-            End Turn
-          </button>
-        )}
-      <HintDisplay roomCode={roomCode} currentTurnTeam={roomData.currentTurnTeam} currentPlayer={currentPlayer} />
-
+      <HintDisplay
+        roomCode={roomCode}
+        currentTurnTeam={roomData.currentTurnTeam}
+        currentPlayer={currentPlayer}
+      />
 
       <div className="player-list">
         <h3>Players in the Room:</h3>
         <ul>
           {roomData.players.map((player, index) => (
             <li key={index} className="player-item">
-              <strong>{player.username}</strong>
-              <span>
-                {" "}
-                - {player.role} ({player.team} Team)
-              </span>
+              <strong>{player.username}</strong> - {player.role} ({player.team}{" "}
+              Team)
             </li>
           ))}
         </ul>

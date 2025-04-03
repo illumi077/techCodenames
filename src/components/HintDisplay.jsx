@@ -52,7 +52,7 @@ function HintDisplay({ roomCode, currentTurnTeam, currentPlayer }) {
         )}
       {currentHint && (
         <div className="hint-message">
-          {`${currentPlayer.team}'s hint: ${currentHint}`}
+          {`${currentHint}`}
         </div>
       )}
     </div>
