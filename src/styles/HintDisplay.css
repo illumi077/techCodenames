@@ -13,7 +13,7 @@
     padding: 5px;
     border-radius: 5px;
   }
-  .retro-input {
+  .retro-input input{
     font-family: 'Press Start 2P', cursive;
     font-size: 1rem;
     padding: 0.625rem; /* Adjusted for consistent spacing */
