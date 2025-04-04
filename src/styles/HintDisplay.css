@@ -4,7 +4,9 @@
     text-align: center;
   }
   
-  
+  .retro-input{
+    width: 80vw;
+  }
   .hint-message {
     font-size: 1.2rem;
     font-weight: bold;
