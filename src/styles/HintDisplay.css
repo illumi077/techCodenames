@@ -4,7 +4,9 @@
     text-align: center;
   }
   
-  
+  .hint-input{
+    width: 30vw;
+  }
   .hint-message {
     font-size: 1.2rem;
     font-weight: bold;
@@ -16,6 +18,7 @@
   .retro-input input{
     font-family: 'Press Start 2P', cursive;
     font-size: 1rem;
+    width: 75%;
     padding: 0.625rem; /* Adjusted for consistent spacing */
     margin-bottom: 1.25rem;
     border: 0.1875rem solid black; /* Rem-based border */

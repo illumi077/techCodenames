@@ -13,7 +13,7 @@ function Room() {
   const [error, setError] = useState("");
   const [timer, setTimer] = useState(50);
   const navigate = useNavigate();
-  
+
   useEffect(() => {
     if (timer > 0 && roomData?.gameState === "active") {
       const countdown = setTimeout(() => setTimer((prev) => prev - 1), 999);
@@ -22,16 +22,16 @@ function Room() {
       socket.emit("timerExpired", roomCode); // **Single emission per cycle**
     }
   }, [timer, roomData, roomCode]);
+  
   useEffect(() => {
     socket.on("gameStartFailed", ({ message }) => {
-      alert(message);
+      alert(message); // Prevents the game from starting if conditions aren't met
     });
-  
+
     return () => {
-      socket.off("gameStartFailed"); // Cleanup listener
+      socket.off("gameStartFailed"); // Cleanup
     };
   }, []);
-  
 
   useEffect(() => {
     socket.emit("joinRoom", roomCode);
@@ -58,7 +58,6 @@ function Room() {
         setLoading(false);
       }
     };
-    
 
     fetchRoomData();
     const interval = setInterval(fetchRoomData, 2000);
@@ -87,7 +86,7 @@ function Room() {
         gameState: "paused",
       }));
     });
-    
+
     socket.on("gameResumed", ({ message }) => {
       alert(message);
       setRoomData((prevData) => ({
@@ -95,7 +94,7 @@ function Room() {
         gameState: "active",
       }));
     });
-    
+
     socket.on("gameStarted", ({ currentTurnTeam, timerStartTime }) => {
       setRoomData((prevData) => ({
         ...prevData,
@@ -256,6 +255,7 @@ function Room() {
         roomCode={roomCode}
         currentTurnTeam={roomData.currentTurnTeam}
         currentPlayer={currentPlayer}
+        gameState={roomData.gameState}
       />
 
       <div className="player-list">
