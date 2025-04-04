@@ -24,17 +24,20 @@ function Room() {
   
         setTimer(remainingTime);
   
-        // ✅ Emit `timerExpired` ONLY when globally synced timer reaches zero
-        if (remainingTime === 0) {
-          console.log("⏳ Timer expired, switching turn...");
-          socket.emit("timerExpired", { roomCode });
-          clearInterval(interval); // ✅ Prevent unnecessary emissions
+        // ✅ Ensure a brief delay before triggering timerExpired
+        if (remainingTime <= 0) {
+          setTimeout(() => {
+            console.log("⏳ Timer expired, switching turn...");
+            socket.emit("timerExpired", { roomCode });
+            clearInterval(interval); // ✅ Prevent unnecessary emissions
+          }, 200); // ✅ Small buffer delay (200ms) ensures the check stabilizes
         }
       }, 1000);
   
       return () => clearInterval(interval); // Cleanup on unmount
     }
   }, [roomData?.timerStartTime, roomData?.gameState, roomCode]);
+  
   
 
   // **Game start failure notification**
@@ -121,16 +124,17 @@ function Room() {
 
     // ✅ Ensuring Timer Syncs on Turn Switch
     socket.on("turnSwitched", ({ currentTurnTeam, timerStartTime }) => {
-      console.log(
-        `🔄 Turn switched to ${currentTurnTeam}, Timer reset at: ${timerStartTime}`
-      );
-
-      setRoomData((prevData) => ({
-        ...prevData,
-        currentTurnTeam,
-        timerStartTime,
-      }));
+      console.log(`🔄 Turn switched to ${currentTurnTeam}, Timer reset at: ${timerStartTime}`);
+    
+      setTimeout(() => {
+        setRoomData((prevData) => ({
+          ...prevData,
+          currentTurnTeam,
+          timerStartTime,
+        }));
+      }, 200); // ✅ Add buffer delay to stabilize turn switching
     });
+    
 
     socket.on("gameEnded", ({ result }) => {
       setRoomData((prevData) => ({
