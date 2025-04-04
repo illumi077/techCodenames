@@ -8,13 +8,12 @@ function HintDisplay({ roomCode, currentTurnTeam, currentPlayer, gameState }) {
 
   useEffect(() => {
     const handleNewHint = (hint) => {
-      if (hint !== "") {
-        setCurrentHint(hint); // Set new hint only if it's valid
-      }
+      console.log("Received new hint:", hint); // Debugging log
+      setCurrentHint(hint); // ✅ Ensure hint updates properly
     };
 
     const handleTurnSwitched = () => {
-      setTimeout(() => setCurrentHint(""), 500); // Ensures smooth turn transition before clearing
+      setTimeout(() => setCurrentHint(""), 500);
     };
 
     const handleGamePaused = () => {
@@ -25,12 +24,14 @@ function HintDisplay({ roomCode, currentTurnTeam, currentPlayer, gameState }) {
       setCurrentHint(""); // Clear paused message when game resumes
     };
 
+    // **Attach socket listeners**
     socket.on("newHint", handleNewHint);
     socket.on("turnSwitched", handleTurnSwitched);
     socket.on("gamePaused", handleGamePaused);
     socket.on("gameResumed", handleGameResumed);
 
     return () => {
+      // **Cleanup listeners on unmount**
       socket.off("newHint", handleNewHint);
       socket.off("turnSwitched", handleTurnSwitched);
       socket.off("gamePaused", handleGamePaused);
@@ -50,11 +51,13 @@ function HintDisplay({ roomCode, currentTurnTeam, currentPlayer, gameState }) {
         hint,
         username: currentPlayer.username,
       });
+
       socket.emit("submitHint", {
         roomCode,
         hint,
         username: currentPlayer.username,
       });
+
       setHint("");
     }
   };
