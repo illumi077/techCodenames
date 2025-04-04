@@ -122,16 +122,18 @@ function Room() {
     });
 
     socket.on("turnSwitched", ({ currentTurnTeam, timerStartTime }) => {
-      console.log(`Turn switched to ${currentTurnTeam}, Timer reset at: ${timerStartTime}`);
-
+      console.log(`🔄 Frontend Turn switched to ${currentTurnTeam}, Timer reset at: ${timerStartTime}`);
+    
       setRoomData((prevData) => ({
         ...prevData,
         currentTurnTeam,
         timerStartTime,
       }));
-
-      setTimer(50); //  Ensure the timer properly resets when turns switch
+    
+      // ✅ Ensure the timer properly resets
+      setTimer(50);
     });
+    
 
     socket.on("gameEnded", ({ result }) => {
       alert(result);
