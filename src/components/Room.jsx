@@ -22,12 +22,17 @@ function Room() {
           Date.now() - new Date(roomData.timerStartTime).getTime();
         const remainingTime = Math.max(50 - Math.floor(timeElapsed / 1000), 0);
 
-        setTimer(remainingTime); // ✅ Ensures global synchronization across all clients
+        setTimer(remainingTime);
+
+        if (remainingTime === 0) {
+          console.log("⏳ Timer expired, switching turn...");
+          socket.emit("timerExpired", { roomCode });
+        }
       }, 1000);
 
       return () => clearInterval(interval);
     }
-  }, [roomData?.timerStartTime, roomData?.gameState]);
+  }, [roomData?.timerStartTime, roomData?.gameState, roomCode]);
 
   // **Game start failure notification**
   useEffect(() => {
@@ -125,10 +130,10 @@ function Room() {
     });
 
     socket.on("gameEnded", ({ result }) => {
-      alert(result);
       setRoomData((prevData) => ({
         ...prevData,
         gameState: "ended",
+        endMessage: result, // ✅ Store the message in `roomData`
       }));
     });
 
@@ -240,7 +245,13 @@ function Room() {
             <h3>Time Remaining: {timer}s</h3>
           </>
         )}
+        {roomData.gameState === "ended" && roomData.endMessage && (
+          <div className="end-game-message">
+            <h2>{roomData.endMessage}</h2>
+          </div>
+        )}
       </div>
+
       {/* ✅ Grid Rendering */}
       <div className="grid">
         {roomData.wordSet.map((word, index) => {
