@@ -14,29 +14,21 @@ function Room() {
   const [timer, setTimer] = useState(50);
   const navigate = useNavigate();
 
-  // **Timer expiration logic**
+  // **Global Timer Sync Logic**
   useEffect(() => {
-    if (timer > 0 && roomData?.gameState === "active") {
-      const countdown = setTimeout(() => setTimer((prev) => prev - 1), 999);
-      return () => clearTimeout(countdown);
-    } else if (timer === 0 && roomData?.gameState === "active") {
-      console.log("⏳ Timer expired, switching turn...");
-      socket.emit("timerExpired", { roomCode });
+    if (roomData?.gameState === "active" && roomData?.timerStartTime) {
+      const interval = setInterval(() => {
+        const timeElapsed =
+          Date.now() - new Date(roomData.timerStartTime).getTime();
+        const remainingTime = Math.max(50 - Math.floor(timeElapsed / 1000), 0);
+
+        setTimer(remainingTime); // ✅ Ensures global synchronization across all clients
+      }, 1000);
+
+      return () => clearInterval(interval);
     }
-  }, [timer, roomData, roomCode]);
-  
-  socket.on("turnSwitched", ({ currentTurnTeam, timerStartTime }) => {
-    console.log(`🔄 Turn switched to ${currentTurnTeam}`);
-    setRoomData((prevData) => ({
-      ...prevData,
-      currentTurnTeam,
-      timerStartTime,
-    }));
-  
-    // ✅ Reset timer when turn switches
-    setTimer(50);
-  });
-  
+  }, [roomData?.timerStartTime, roomData?.gameState]);
+
   // **Game start failure notification**
   useEffect(() => {
     socket.on("gameStartFailed", ({ message }) => {
@@ -65,7 +57,7 @@ function Room() {
           setTimeout(() => navigate("/"), 1000);
         }
       } catch (err) {
-        setError("An error occurred while fetching room details.",err);
+        setError("An error occurred while fetching room details.", err);
         setTimeout(() => navigate("/"), 1000);
       } finally {
         setLoading(false);
@@ -108,7 +100,6 @@ function Room() {
         ...prevData,
         gameState: "active",
       }));
-      setTimer(50); //  Reset timer on game resume
     });
 
     socket.on("gameStarted", ({ currentTurnTeam, timerStartTime }) => {
@@ -118,22 +109,20 @@ function Room() {
         timerStartTime,
         gameState: "active",
       }));
-      setTimer(50);
     });
 
+    // ✅ Ensuring Timer Syncs on Turn Switch
     socket.on("turnSwitched", ({ currentTurnTeam, timerStartTime }) => {
-      console.log(`🔄 Frontend Turn switched to ${currentTurnTeam}, Timer reset at: ${timerStartTime}`);
-    
+      console.log(
+        `🔄 Turn switched to ${currentTurnTeam}, Timer reset at: ${timerStartTime}`
+      );
+
       setRoomData((prevData) => ({
         ...prevData,
         currentTurnTeam,
         timerStartTime,
       }));
-    
-      // ✅ Ensure the timer properly resets
-      setTimer(50);
     });
-    
 
     socket.on("gameEnded", ({ result }) => {
       alert(result);
@@ -225,27 +214,33 @@ function Room() {
   return (
     <div className="room-container">
       <div className="player-info">
-        <h2 className="player-name">{currentPlayer?.username || "Unknown Player"}</h2>
-        <p className="player-role">{currentPlayer?.role || "Role Unavailable"}</p>
-        <p className="player-team">{currentPlayer?.team || "Team Unavailable"} Team</p>
+        <h2 className="player-name">
+          {currentPlayer?.username || "Unknown Player"}
+        </h2>
+        <p className="player-role">
+          {currentPlayer?.role || "Role Unavailable"}
+        </p>
+        <p className="player-team">
+          {currentPlayer?.team || "Team Unavailable"} Team
+        </p>
       </div>
 
       {roomData.gameState === "waiting" &&
-        currentPlayer.role === "Spymaster" &&  currentPlayer.team === "Red" (
+        currentPlayer.role === "Spymaster" &&
+        currentPlayer.team === "Red" && (
           <button className="retro-button" onClick={handleStartGame}>
             Start Game
           </button>
         )}
 
       <div className="game-info">
-        {roomData.gameState === "active" && (
+        {roomData.gameState === "active" && roomData?.timerStartTime && (
           <>
             <h3>Current Turn: {roomData.currentTurnTeam} Team</h3>
             <h3>Time Remaining: {timer}s</h3>
           </>
         )}
       </div>
-
       {/* ✅ Grid Rendering */}
       <div className="grid">
         {roomData.wordSet.map((word, index) => {
@@ -256,7 +251,11 @@ function Room() {
             : "";
 
           return (
-            <div key={index} className={`tile ${tileClass}`} onClick={() => handleTileClick(index)}>
+            <div
+              key={index}
+              className={`tile ${tileClass}`}
+              onClick={() => handleTileClick(index)}
+            >
               {roomData.revealedTiles[index] ? "" : word}
             </div>
           );
@@ -269,20 +268,9 @@ function Room() {
         currentPlayer={currentPlayer}
       />
 
-      <div className="player-list">
-        <h3>Players in the Room:</h3>
-        <ul>
-          {roomData.players.map((player, index) => (
-            <li key={index} className="player-item">
-              <strong>{player.username}</strong> - {player.role} ({player.team}{" "}
-              Team)
-              
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <button className="retro-button" onClick={handleLeaveRoom}>Leave Room</button>
+      <button className="retro-button" onClick={handleLeaveRoom}>
+        Leave Room
+      </button>
     </div>
   );
 }
