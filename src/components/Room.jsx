@@ -20,19 +20,22 @@ function Room() {
       const interval = setInterval(() => {
         const timeElapsed =
           Date.now() - new Date(roomData.timerStartTime).getTime();
-        const remainingTime = Math.max(50 - Math.floor(timeElapsed / 1000), 0);
-
+        const remainingTime = Math.max(61 - Math.floor(timeElapsed / 1000), 0);
+  
         setTimer(remainingTime);
-
+  
+        // ✅ Emit `timerExpired` ONLY when globally synced timer reaches zero
         if (remainingTime === 0) {
           console.log("⏳ Timer expired, switching turn...");
           socket.emit("timerExpired", { roomCode });
+          clearInterval(interval); // ✅ Prevent unnecessary emissions
         }
       }, 1000);
-
-      return () => clearInterval(interval);
+  
+      return () => clearInterval(interval); // Cleanup on unmount
     }
   }, [roomData?.timerStartTime, roomData?.gameState, roomCode]);
+  
 
   // **Game start failure notification**
   useEffect(() => {
