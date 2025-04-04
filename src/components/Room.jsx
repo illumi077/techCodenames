@@ -262,6 +262,18 @@ function Room() {
         })}
       </div>
 
+      <div className="player-list">
+        <h3>Players in the Room:</h3>
+        <ul>
+          {roomData.players.map((player, index) => (
+            <li key={index} className="player-item">
+              <strong>{player.username}</strong> - {player.role} ({player.team}{" "}
+              Team)
+            </li>
+          ))}
+        </ul>
+      </div>
+
       <HintDisplay
         roomCode={roomCode}
         currentTurnTeam={roomData.currentTurnTeam}
