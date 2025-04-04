@@ -20,10 +20,23 @@ function Room() {
       const countdown = setTimeout(() => setTimer((prev) => prev - 1), 999);
       return () => clearTimeout(countdown);
     } else if (timer === 0 && roomData?.gameState === "active") {
+      console.log("⏳ Timer expired, switching turn...");
       socket.emit("timerExpired", { roomCode });
     }
   }, [timer, roomData, roomCode]);
-
+  
+  socket.on("turnSwitched", ({ currentTurnTeam, timerStartTime }) => {
+    console.log(`🔄 Turn switched to ${currentTurnTeam}`);
+    setRoomData((prevData) => ({
+      ...prevData,
+      currentTurnTeam,
+      timerStartTime,
+    }));
+  
+    // ✅ Reset timer when turn switches
+    setTimer(50);
+  });
+  
   // **Game start failure notification**
   useEffect(() => {
     socket.on("gameStartFailed", ({ message }) => {
