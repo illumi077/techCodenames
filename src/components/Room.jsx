@@ -21,9 +21,9 @@ function Room() {
         const timeElapsed =
           Date.now() - new Date(roomData.timerStartTime).getTime();
         const remainingTime = Math.max(61 - Math.floor(timeElapsed / 1000), 0);
-  
+
         setTimer(remainingTime);
-  
+
         // ✅ Ensure a brief delay before triggering timerExpired
         if (remainingTime <= 0) {
           setTimeout(() => {
@@ -33,12 +33,10 @@ function Room() {
           }, 200); // ✅ Small buffer delay (200ms) ensures the check stabilizes
         }
       }, 1000);
-  
+
       return () => clearInterval(interval); // Cleanup on unmount
     }
   }, [roomData?.timerStartTime, roomData?.gameState, roomCode]);
-  
-  
 
   // **Game start failure notification**
   useEffect(() => {
@@ -124,8 +122,10 @@ function Room() {
 
     // ✅ Ensuring Timer Syncs on Turn Switch
     socket.on("turnSwitched", ({ currentTurnTeam, timerStartTime }) => {
-      console.log(`🔄 Turn switched to ${currentTurnTeam}, Timer reset at: ${timerStartTime}`);
-    
+      console.log(
+        `🔄 Turn switched to ${currentTurnTeam}, Timer reset at: ${timerStartTime}`
+      );
+
       setTimeout(() => {
         setRoomData((prevData) => ({
           ...prevData,
@@ -134,13 +134,14 @@ function Room() {
         }));
       }, 200); // ✅ Add buffer delay to stabilize turn switching
     });
-    
 
     socket.on("gameEnded", ({ result }) => {
+      console.log("🏁 Game Ended:", result); // ✅ Debugging log
+
       setRoomData((prevData) => ({
         ...prevData,
         gameState: "ended",
-        endMessage: result, // ✅ Store the message in `roomData`
+        endMessage: result, // ✅ Store message properly in UI
       }));
     });
 
@@ -158,10 +159,16 @@ function Room() {
 
   const handleTileClick = (index) => {
     if (
-      roomData.currentTurnTeam === currentPlayer.team &&
-      !roomData.revealedTiles[index] &&
-      currentPlayer.role !== "Spymaster"
+      roomData.gameState === "ended" || // ✅ Prevent clicks after game ends
+      roomData.currentTurnTeam !== currentPlayer.team ||
+      roomData.revealedTiles[index] ||
+      currentPlayer.role === "Spymaster"
     ) {
+      return;
+    }
+
+    // ✅ Keep existing method while improving stability
+    setTimeout(() => {
       setRoomData((prevData) => {
         const updatedRevealedTiles = [...prevData.revealedTiles];
         updatedRevealedTiles[index] = true;
@@ -172,7 +179,7 @@ function Room() {
       });
 
       socket.emit("tileClicked", { roomCode, index });
-    }
+    }, 200); // ✅ Buffer delay improves responsiveness
   };
 
   const handleStartGame = async () => {
