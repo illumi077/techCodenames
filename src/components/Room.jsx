@@ -240,6 +240,7 @@ function Room() {
             <li key={index} className="player-item">
               <strong>{player.username}</strong> - {player.role} ({player.team}{" "}
               Team)
+              
             </li>
           ))}
         </ul>
