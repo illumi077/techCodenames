@@ -248,7 +248,24 @@ function Room() {
         })}
       </div>
 
-      <HintDisplay roomCode={roomCode} currentTurnTeam={roomData.currentTurnTeam} currentPlayer={currentPlayer} gameState={roomData.gameState} />
+      <HintDisplay
+        roomCode={roomCode}
+        currentTurnTeam={roomData.currentTurnTeam}
+        currentPlayer={currentPlayer}
+      />
+
+      <div className="player-list">
+        <h3>Players in the Room:</h3>
+        <ul>
+          {roomData.players.map((player, index) => (
+            <li key={index} className="player-item">
+              <strong>{player.username}</strong> - {player.role} ({player.team}{" "}
+              Team)
+              
+            </li>
+          ))}
+        </ul>
+      </div>
 
       <button className="retro-button" onClick={handleLeaveRoom}>Leave Room</button>
     </div>
