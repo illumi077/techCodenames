@@ -231,7 +231,7 @@ function Room() {
       </div>
 
       {roomData.gameState === "waiting" &&
-        currentPlayer.role === "Spymaster" && (
+        currentPlayer.role === "Spymaster" &&  currentPlayer.team === "Red" (
           <button className="retro-button" onClick={handleStartGame}>
             Start Game
           </button>
