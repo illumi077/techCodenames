@@ -13,7 +13,12 @@ function HintDisplay({ roomCode, currentTurnTeam, currentPlayer, gameState }) {
     };
 
     const handleTurnSwitched = () => {
-      setTimeout(() => setCurrentHint(""), 500);
+      setTimeout(() => {
+        if (currentHint) {
+          console.log("🔄 Clearing hint after turn switch...");
+          setCurrentHint("");
+        }
+      }, 1000); // ✅ Increased delay to 1.5 seconds
     };
 
     const handleGamePaused = () => {
@@ -37,7 +42,18 @@ function HintDisplay({ roomCode, currentTurnTeam, currentPlayer, gameState }) {
       socket.off("gamePaused", handleGamePaused);
       socket.off("gameResumed", handleGameResumed);
     };
+  }, [currentHint]);
+  
+  useEffect(() => {
+    socket.on("hintRejected", ({ message }) => {
+      alert(message); // ✅ Notify Spymaster that they can’t submit another hint
+    });
+  
+    return () => {
+      socket.off("hintRejected");
+    };
   }, []);
+  
 
   const handleHintSubmit = () => {
     if (
@@ -79,6 +95,7 @@ function HintDisplay({ roomCode, currentTurnTeam, currentPlayer, gameState }) {
             </button>
           </div>
         )}
+
       {currentHint && <div className="hint-message">{currentHint}</div>}
     </div>
   );

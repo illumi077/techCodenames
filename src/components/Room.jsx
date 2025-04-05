@@ -11,7 +11,7 @@ function Room() {
   const [roomData, setRoomData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [timer, setTimer] = useState(50);
+  const [timer, setTimer] = useState(60);
   const navigate = useNavigate();
 
   // **Global Timer Sync Logic**
@@ -246,7 +246,14 @@ function Room() {
 
       {roomData.gameState === "waiting" &&
         currentPlayer.role === "Spymaster" &&
-        currentPlayer.team === "Red" && (
+        currentPlayer.team === "Red" &&
+        roomData.players.filter((p) => p.team === "Red" && p.role === "Agent")
+          .length > 0 &&
+        roomData.players.filter((p) => p.team === "Blue" && p.role === "Agent")
+          .length > 0 &&
+        roomData.players.some(
+          (p) => p.team === "Blue" && p.role === "Spymaster"
+        ) && (
           <button className="retro-button" onClick={handleStartGame}>
             Start Game
           </button>
