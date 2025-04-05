@@ -5,15 +5,15 @@ import "../styles/HintDisplay.css";
 function HintDisplay({ roomCode, currentTurnTeam, currentPlayer, gameState }) {
   const [hint, setHint] = useState("");
   const [currentHint, setCurrentHint] = useState("");
-  const [hintSubmitted, setHintSubmitted] = useState(false); // ✅ Prevent multiple hints per turn
+  const [hintSubmitted, setHintSubmitted] = useState(false);
 
   useEffect(() => {
     console.log("🧐 HintDisplay Mounted, Props Received:", { roomCode, currentTurnTeam, currentPlayer, gameState });
 
     const handleNewHint = (hint) => {
-      console.log("📢 New Hint Received:", hint);
+      console.log("📢 Received Hint from Backend:", hint);
       setCurrentHint(hint);
-      setHintSubmitted(true); // ✅ Mark hint as submitted
+      setHintSubmitted(true);
     };
 
     const handleTurnSwitched = () => {
@@ -21,9 +21,9 @@ function HintDisplay({ roomCode, currentTurnTeam, currentPlayer, gameState }) {
         if (currentHint) {
           console.log("🔄 Clearing hint after turn switch...");
           setCurrentHint("");
-          setHintSubmitted(false); // ✅ Reset hint submission when turn changes
+          setHintSubmitted(false);
         }
-      }, 1500); // ✅ Slight delay for better UX
+      }, 1500);
     };
 
     const handleGamePaused = () => {
@@ -37,7 +37,6 @@ function HintDisplay({ roomCode, currentTurnTeam, currentPlayer, gameState }) {
       setHintSubmitted(false);
     };
 
-    // **Attach socket listeners**
     socket.on("newHint", handleNewHint);
     socket.on("turnSwitched", handleTurnSwitched);
     socket.on("gamePaused", handleGamePaused);
@@ -50,7 +49,7 @@ function HintDisplay({ roomCode, currentTurnTeam, currentPlayer, gameState }) {
       socket.off("gamePaused", handleGamePaused);
       socket.off("gameResumed", handleGameResumed);
     };
-  }, [currentHint, gameState, currentPlayer, currentTurnTeam, roomCode]);
+  }, [roomCode, currentTurnTeam, gameState]);
 
   useEffect(() => {
     socket.on("hintRejected", ({ message }) => {
@@ -69,7 +68,7 @@ function HintDisplay({ roomCode, currentTurnTeam, currentPlayer, gameState }) {
       currentPlayer.role === "Spymaster" &&
       currentPlayer.team === currentTurnTeam &&
       gameState === "active" &&
-      !hintSubmitted // ✅ Prevent multiple hints per turn
+      !hintSubmitted
     ) {
       console.log("📝 Submitting hint:", {
         roomCode,
@@ -94,7 +93,7 @@ function HintDisplay({ roomCode, currentTurnTeam, currentPlayer, gameState }) {
       {currentPlayer.role === "Spymaster" &&
         currentPlayer.team === currentTurnTeam &&
         gameState === "active" &&
-        !hintSubmitted && ( // ✅ Block hint field if already submitted
+        !hintSubmitted && (
           <div className="retro-input">
             <input
               type="text"
@@ -108,7 +107,12 @@ function HintDisplay({ roomCode, currentTurnTeam, currentPlayer, gameState }) {
           </div>
         )}
 
-      {currentHint && <div className="hint-message">{currentHint}</div>}
+      {currentHint && (
+        <div className="hint-message">
+          {console.log("🖥️ Rendering Hint Message:", currentHint)}
+          <h2>{currentHint}</h2>
+        </div>
+      )}
     </div>
   );
 }
