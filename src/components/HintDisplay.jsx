@@ -2,13 +2,24 @@ import React, { useState, useEffect } from "react";
 import { socket } from "../utils/socket";
 import "../styles/HintDisplay.css";
 
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+
 function HintDisplay({ roomCode, currentTurnTeam, currentPlayer, gameState }) {
   const [hint, setHint] = useState("");
   const [currentHint, setCurrentHint] = useState("");
   const [hintSubmitted, setHintSubmitted] = useState(false);
 
   useEffect(() => {
-    console.log("🧐 HintDisplay Mounted - Room:", roomCode);
+    console.log("🧐 HintDisplay Mounted - Fetching hint from DB...");
+
+    // ✅ Fetch hint from the database on mount
+    fetch(`${backendUrl}/api/rooms/${roomCode}/hint`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("📢 Hint fetched from DB:", data.currentHint);
+        setCurrentHint(data.currentHint || "");
+      })
+      .catch((error) => console.error("⚠️ Error fetching hint:", error));
 
     const handleNewHint = (hint) => {
       console.log("📢 Received Hint from Backend:", hint);
@@ -24,29 +35,14 @@ function HintDisplay({ roomCode, currentTurnTeam, currentPlayer, gameState }) {
       }, 1500);
     };
 
-    const handleGamePaused = () => setCurrentHint("Game is paused. Waiting for players...");
-    const handleGameResumed = () => {
-      setCurrentHint("");
-      setHintSubmitted(false);
-    };
-
     socket.on("newHint", handleNewHint);
     socket.on("turnSwitched", handleTurnSwitched);
-    socket.on("gamePaused", handleGamePaused);
-    socket.on("gameResumed", handleGameResumed);
 
     return () => {
       socket.off("newHint", handleNewHint);
       socket.off("turnSwitched", handleTurnSwitched);
-      socket.off("gamePaused", handleGamePaused);
-      socket.off("gameResumed", handleGameResumed);
     };
   }, [roomCode, currentTurnTeam]);
-
-  useEffect(() => {
-    socket.on("hintRejected", ({ message }) => alert(message));
-    return () => socket.off("hintRejected");
-  }, []);
 
   const handleHintSubmit = () => {
     if (
