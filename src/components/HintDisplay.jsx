@@ -14,8 +14,9 @@ function HintDisplay({ roomCode, currentTurnTeam, currentPlayer, gameState }) {
     console.log("📡 Fetching hint from DB...");
     try {
       const response = await fetch(`${backendUrl}/api/rooms/${roomCode}/hint`);
+      console.log("🛠️ Raw Response:", response);
       const data = await response.json();
-      console.log("📢 Fetched Hint:", data.currentHint);
+      console.log("📢 Parsed Hint Data:", data.currentHint);
       setCurrentHint(data.currentHint || "");
     } catch (error) {
       console.error("⚠️ Error fetching hint:", error);
