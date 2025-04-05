@@ -159,7 +159,8 @@ function Room() {
 
   const handleTileClick = (index) => {
     if (
-      roomData.gameState === "ended" || // ✅ Prevent clicks after game ends
+      roomData.gameState === "ended" ||
+      roomData.gameState === "paused" || // ✅ Prevent clicks after game ends
       roomData.currentTurnTeam !== currentPlayer.team ||
       roomData.revealedTiles[index] ||
       currentPlayer.role === "Spymaster"
@@ -227,7 +228,6 @@ function Room() {
   const currentPlayer = roomData.players.find(
     (player) => player.username === sessionStorage.getItem("username")
   );
-
   const isSpymaster = currentPlayer?.role === "Spymaster";
 
   return (
@@ -310,6 +310,7 @@ function Room() {
         roomCode={roomCode}
         currentTurnTeam={roomData.currentTurnTeam}
         currentPlayer={currentPlayer}
+        gameState={roomData.gameState} // ✅ Explicitly pass gameState
       />
 
       <button className="retro-button" onClick={handleLeaveRoom}>
