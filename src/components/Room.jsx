@@ -11,7 +11,7 @@ function Room() {
   const [roomData, setRoomData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [timer, setTimer] = useState(60);
+  const [timer, setTimer] = useState(0);
   const navigate = useNavigate();
 
   // **Global Timer Sync Logic**
