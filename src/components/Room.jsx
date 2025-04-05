@@ -129,7 +129,7 @@ function Room() {
           currentTurnTeam,
           timerEndTime,
         }));
-      }, 200); 
+      }, 200); // ✅ Buffer delay for stability
     });
 
     socket.on("gameEnded", ({ result }) => {
@@ -183,7 +183,7 @@ function Room() {
         index,
         currentTurnTeam: roomData.currentTurnTeam,
       });
-    }, 200);
+    }, 150);
   };
 
   
