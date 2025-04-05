@@ -254,7 +254,7 @@ function Room() {
         roomData.players.some(
           (p) => p.team === "Blue" && p.role === "Spymaster"
         ) && (
-          <button className="retro-button" onClick={handleStartGame}>
+          <button className="retro-button start-btn" onClick={handleStartGame}>
             Start Game
           </button>
         )}

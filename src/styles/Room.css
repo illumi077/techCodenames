@@ -17,6 +17,10 @@
   padding: 2rem 1rem;
 }
 
+.start-btn{
+  margin-bottom: 1vh;
+}
+
 /* Room Title (Room Code) */
 .room-title {
   font-size: 2.5rem;
