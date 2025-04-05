@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { socket } from "../utils/socket";
 import "../styles/HintDisplay.css";
 
@@ -10,39 +10,28 @@ function HintDisplay({ roomCode, currentTurnTeam, currentPlayer, gameState }) {
   const [hintSubmitted, setHintSubmitted] = useState(false);
 
   // ✅ Function to fetch hint from DB
-  const fetchHintFromDB = async () => {
-    console.log("📡 Fetching hint from DB...");
+  const fetchHintFromDB = useCallback(async () => {
     try {
       const response = await fetch(`${backendUrl}/api/rooms/${roomCode}/hint`);
-      console.log("🛠️ Raw Response:", response);
       const data = await response.json();
-      console.log("📢 Parsed Hint Data:", data.currentHint);
       setCurrentHint(data.currentHint || "");
     } catch (error) {
-      console.error("⚠️ Error fetching hint:", error);
+      console.error("Error fetching hint:", error);
     }
-  };
+  }, [roomCode]);
 
   useEffect(() => {
-    console.log("🧐 HintDisplay Mounted - Initial Hint Fetch");
     fetchHintFromDB(); // ✅ Fetch hint immediately on mount
 
-    // ✅ Set up periodic fetching every 5 seconds
     const interval = setInterval(() => {
       fetchHintFromDB();
     }, 5000);
 
-    return () => {
-      console.log("🚮 Cleaning up Hint Fetch Interval...");
-      clearInterval(interval);
-    };
-  }, [roomCode]);
+    return () => clearInterval(interval);
+  }, [fetchHintFromDB]);
 
   useEffect(() => {
-    console.log("📡 Setting up socket listeners...");
-    
     const handleNewHint = (hint) => {
-      console.log("📢 Received Hint via Socket:", hint);
       setCurrentHint(hint);
       setHintSubmitted(true);
     };
@@ -50,13 +39,11 @@ function HintDisplay({ roomCode, currentTurnTeam, currentPlayer, gameState }) {
     socket.on("newHint", handleNewHint);
 
     return () => {
-      console.log("🚮 Cleaning up socket listeners...");
       socket.off("newHint", handleNewHint);
     };
   }, []);
 
   const handleHintSubmit = () => {
-    console.log("🔎 Checking if hint submission is valid...");
     if (
       hint.trim() &&
       currentPlayer.role === "Spymaster" &&
@@ -64,21 +51,17 @@ function HintDisplay({ roomCode, currentTurnTeam, currentPlayer, gameState }) {
       gameState === "active" &&
       !hintSubmitted
     ) {
-      console.log("📝 Submitting hint:", { roomCode, hint, username: currentPlayer.username });
-
       socket.emit("submitHint", { roomCode, hint, username: currentPlayer.username });
 
       setHint("");
       setHintSubmitted(true);
-      
+
       setTimeout(fetchHintFromDB, 1000); // ✅ Fetch hint again after submitting
     }
   };
 
   return (
     <div className="hint-container">
-      {console.log("🔎 Rendering HintDisplay - Current Hint:", currentHint, "Hint Submitted:", hintSubmitted)}
-
       {currentPlayer.role === "Spymaster" &&
         currentPlayer.team === currentTurnTeam &&
         gameState === "active" &&
@@ -94,9 +77,6 @@ function HintDisplay({ roomCode, currentTurnTeam, currentPlayer, gameState }) {
           <h2>{currentHint}</h2>
         </div>
       )}
-
-      {/* ✅ Button to manually fetch hint */}
-      <button className="retro-button" onClick={fetchHintFromDB}>Fetch Hint Manually</button>
     </div>
   );
 }
