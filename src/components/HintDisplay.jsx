@@ -8,7 +8,7 @@ function HintDisplay({ roomCode, currentTurnTeam, currentPlayer, gameState }) {
   const [hintSubmitted, setHintSubmitted] = useState(false);
 
   useEffect(() => {
-    console.log("🧐 HintDisplay Mounted, Props Received:", { roomCode, currentTurnTeam, currentPlayer, gameState });
+    console.log("🧐 HintDisplay Mounted - Props Received:", { roomCode, currentTurnTeam, currentPlayer, gameState });
 
     const handleNewHint = (hint) => {
       console.log("📢 Received Hint from Backend:", hint);
@@ -17,9 +17,10 @@ function HintDisplay({ roomCode, currentTurnTeam, currentPlayer, gameState }) {
     };
 
     const handleTurnSwitched = () => {
+      console.log("🔄 Turn switched - Preparing to clear hint...");
       setTimeout(() => {
         if (currentHint) {
-          console.log("🔄 Clearing hint after turn switch...");
+          console.log("🧹 Clearing hint after turn switch.");
           setCurrentHint("");
           setHintSubmitted(false);
         }
@@ -27,42 +28,46 @@ function HintDisplay({ roomCode, currentTurnTeam, currentPlayer, gameState }) {
     };
 
     const handleGamePaused = () => {
-      console.log("⏸️ Game Paused: Blocking hints...");
+      console.log("⏸️ Game Paused - Blocking hint submission.");
       setCurrentHint("Game is paused. Waiting for players...");
     };
 
     const handleGameResumed = () => {
-      console.log("▶️ Game Resumed: Resetting hint...");
+      console.log("▶️ Game Resumed - Resetting hint state.");
       setCurrentHint("");
       setHintSubmitted(false);
     };
 
+    console.log("📡 Setting up socket listeners...");
     socket.on("newHint", handleNewHint);
     socket.on("turnSwitched", handleTurnSwitched);
     socket.on("gamePaused", handleGamePaused);
     socket.on("gameResumed", handleGameResumed);
 
     return () => {
-      console.log("🚮 Cleaning up HintDisplay listeners...");
+      console.log("🚮 Cleaning up HintDisplay socket listeners...");
       socket.off("newHint", handleNewHint);
       socket.off("turnSwitched", handleTurnSwitched);
       socket.off("gamePaused", handleGamePaused);
       socket.off("gameResumed", handleGameResumed);
     };
-  }, [roomCode, currentTurnTeam, gameState]);
+  }, [roomCode, currentTurnTeam, gameState, currentHint, currentPlayer]);
 
   useEffect(() => {
+    console.log("📡 Setting up hint rejection listener...");
     socket.on("hintRejected", ({ message }) => {
       console.log("🚫 Hint Rejected:", message);
       alert(message);
     });
 
     return () => {
+      console.log("🚮 Cleaning up hint rejection listener...");
       socket.off("hintRejected");
     };
   }, []);
 
   const handleHintSubmit = () => {
+    console.log("🔎 Checking if hint submission is valid...");
     if (
       hint.trim() &&
       currentPlayer.role === "Spymaster" &&
@@ -90,6 +95,8 @@ function HintDisplay({ roomCode, currentTurnTeam, currentPlayer, gameState }) {
 
   return (
     <div className="hint-container">
+      {console.log("🔎 Rendering HintDisplay - Current Hint:", currentHint, "Hint Submitted:", hintSubmitted)}
+
       {currentPlayer.role === "Spymaster" &&
         currentPlayer.team === currentTurnTeam &&
         gameState === "active" &&
