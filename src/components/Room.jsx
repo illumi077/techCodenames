@@ -19,21 +19,14 @@ function Room() {
   useEffect(() => {
     if (roomData?.gameState === "active" && roomData?.timerEndTime) {
       const interval = setInterval(() => {
-        setTimer(
-          Math.max(
-            Math.floor(
-              (new Date(roomData.timerEndTime).getTime() - Date.now()) / 1000
-            ),
-            0
-          )
-        );
+        setTimer(Math.max(Math.floor((new Date(roomData.timerEndTime).getTime() - Date.now()) / 1000),0));
       }, 1000);
 
       return () => clearInterval(interval);
     }
   }, [roomData?.timerEndTime, roomData?.gameState]);
 
-  // ✅ Timer only updates when explicitly provided from socket events:
+  
   socket.on("turnSwitched", ({ currentTurnTeam, timerEndTime }) => {
     console.log(`🔄 Turn switched! Updating timer: ${timerEndTime}`);
 
@@ -46,14 +39,14 @@ function Room() {
     }, 200); // ✅ Buffer delay for stability
   });
 
-  // **Game start failure notification**
+  
   useEffect(() => {
     socket.on("gameStartFailed", ({ message }) => alert(message));
 
     return () => socket.off("gameStartFailed");
   }, []);
 
-  // **Set up game state listeners**
+  
   useEffect(() => {
     socket.emit("joinRoom", roomCode);
 
@@ -124,7 +117,7 @@ function Room() {
       }));
     });
 
-    // ✅ Ensuring Timer Syncs on Turn Switch
+    
     socket.on("turnSwitched", ({ currentTurnTeam, timerEndTime }) => {
       console.log(
         `🔄 Turn switched to ${currentTurnTeam}, Timer reset at: ${timerEndTime}`
@@ -136,7 +129,7 @@ function Room() {
           currentTurnTeam,
           timerEndTime,
         }));
-      }, 200); // ✅ Buffer delay for stability
+      }, 200); 
     });
 
     socket.on("gameEnded", ({ result }) => {
@@ -193,7 +186,7 @@ function Room() {
     }, 200);
   };
 
-  // ✅ Ensuring Timer Syncs Only Once (Moved Outside Click Handler)
+  
   useEffect(() => {
     socket.on("turnSwitched", ({ currentTurnTeam, timerEndTime }) => {
       console.log(`🔄 Turn switched! Syncing timer update.`);
@@ -212,7 +205,7 @@ function Room() {
   const handleStartGame = async () => {
     if (roomData.gameState === "active") {
       console.log("🚫 Game already active, ignoring extra start requests.");
-      return; // ✅ Prevents multiple game start attempts
+      return; 
     }
 
     try {
@@ -229,7 +222,7 @@ function Room() {
         console.log("🚀 Game started! Timer syncing...");
         setRoomData((prevData) => ({
           ...prevData,
-          timerEndTime: data.timerEndTime, // ✅ Sync the initial timer state
+          timerEndTime: data.timerEndTime, 
           gameState: "active",
         }));
       }
@@ -251,7 +244,6 @@ function Room() {
       if (response.status === 200) {
         socket.emit("playerLeft", { roomCode, players: data.players });
 
-        // ✅ Only request timer update if game state changes (e.g., pause)
         if (data.gameState === "paused") {
           socket.emit("requestTimerUpdate", { roomCode });
         }
@@ -304,7 +296,7 @@ function Room() {
         )}
 
       <div className="game-info">
-        {roomData.gameState === "active" && roomData?.timerStartTime && (
+        {roomData.gameState === "active" && roomData?.timerEndTime && (
           <>
             <h3>Current Turn: {roomData.currentTurnTeam} Team</h3>
             <h3>Time Remaining: {timer}s</h3>
@@ -316,6 +308,7 @@ function Room() {
           </div>
         )}
       </div>
+
 
       {/* ✅ Grid Rendering */}
       <div className="grid">
@@ -338,6 +331,13 @@ function Room() {
         })}
       </div>
 
+      <HintDisplay
+        roomCode={roomCode}
+        currentTurnTeam={roomData.currentTurnTeam}
+        currentPlayer={currentPlayer}
+        gameState={roomData.gameState} 
+      />
+
       <div className="player-list">
         <h3>Players in the Room:</h3>
         <ul>
@@ -349,13 +349,6 @@ function Room() {
           ))}
         </ul>
       </div>
-
-      <HintDisplay
-        roomCode={roomCode}
-        currentTurnTeam={roomData.currentTurnTeam}
-        currentPlayer={currentPlayer}
-        gameState={roomData.gameState} // ✅ Explicitly pass gameState
-      />
 
       <button className="retro-button" onClick={handleLeaveRoom}>
         Leave Room
