@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Header from "./Header"
 import '../styles/CreateRoom.css'; // Ensure your styles are imported correctly
 const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 function CreateRoom() {
@@ -61,47 +62,51 @@ function CreateRoom() {
   };
 
   return (
-    <div className="create-room-container">
-      <h2 className="create-title">Create a Room</h2>
-      <input
-        className="retro-input"
-        type="text"
-        placeholder="Enter Room Code"
-        value={roomCode}
-        onChange={(e) => setRoomCode(e.target.value)}
-      />
-      <input
-        className="retro-input"
-        type="text"
-        placeholder="Enter Your Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-      <select
-        className="retro-input"
-        value={team}
-        onChange={(e) => setTeam(e.target.value)}
-      >
-        <option value="Red">Red Team</option>
-        <option value="Blue">Blue Team</option>
-      </select>
-      <select
-        className="retro-input"
-        value={role}
-        onChange={(e) => setRole(e.target.value)}
-      >
-        <option value="Agent">Agent</option>
-        <option value="Spymaster">Spymaster</option>
-      </select>
-      {errorMessage && <p className="error-message">{errorMessage}</p>}
-      <button
-        className="retro-button"
-        onClick={handleCreateRoom}
-        disabled={loading} // Disable button during loading
-      >
-        {loading ? 'Creating...' : 'Create Room'}
-      </button>
-    </div>
+    <>
+
+      <Header />
+      <div className="create-room-container">
+        <h2 className="create-title">Create a Room</h2>
+        <input
+          className="retro-input"
+          type="text"
+          placeholder="Enter Room Code"
+          value={roomCode}
+          onChange={(e) => setRoomCode(e.target.value)}
+        />
+        <input
+          className="retro-input"
+          type="text"
+          placeholder="Enter Your Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <select
+          className="retro-input"
+          value={team}
+          onChange={(e) => setTeam(e.target.value)}
+        >
+          <option value="Red">Red Team</option>
+          <option value="Blue">Blue Team</option>
+        </select>
+        <select
+          className="retro-input"
+          value={role}
+          onChange={(e) => setRole(e.target.value)}
+        >
+          <option value="Agent">Agent</option>
+          <option value="Spymaster">Spymaster</option>
+        </select>
+        {errorMessage && <p className="error-message">{errorMessage}</p>}
+        <button
+          className="retro-button"
+          onClick={handleCreateRoom}
+          disabled={loading} // Disable button during loading
+        >
+          {loading ? 'Creating...' : 'Create Room'}
+        </button>
+      </div>
+    </>
   );
 }
 

@@ -190,11 +190,15 @@ function Room() {
   useEffect(() => {
     socket.on("turnSwitched", ({ currentTurnTeam, timerEndTime }) => {
       console.log(`🔄 Turn switched! Syncing timer update.`);
-      setRoomData((prevData) => ({
-        ...prevData,
-        currentTurnTeam,
-        timerEndTime,
-      }));
+      setTimeout(() => {
+        setRoomData((prevData) => ({
+          ...prevData,
+          currentTurnTeam,
+          timerEndTime,
+          currentHint: "",  // ✅ Clear hint to ensure re-render
+          hintSubmitted: false, // ✅ Reset submission state to prevent UI inconsistencies
+        }));
+      }, 2000);
     });
 
     return () => {
@@ -216,9 +220,15 @@ function Room() {
       });
 
       const data = await response.json();
-      if (!response.ok) {
-        alert(data.error || "Failed to start the game.");
-      } else {
+
+      // ✅ Ensure the request is actually processed before alerting
+      setTimeout(() => {
+        if (!response.ok) {
+          alert(data.error || "Failed to start the game.");
+        }
+      }, 500); // ✅ Small buffer delay before firing alert
+
+      if (response.ok) {
         console.log("🚀 Game started! Timer syncing...");
         setRoomData((prevData) => ({
           ...prevData,
@@ -229,7 +239,8 @@ function Room() {
     } catch (error) {
       console.error("Error starting game:", error);
     }
-  };
+};
+
 
   const handleLeaveRoom = async () => {
     const username = sessionStorage.getItem("username");

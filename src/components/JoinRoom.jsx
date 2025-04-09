@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/JoinRoom.css'; // Import styling for JoinRoom
 const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+import Header from "./Header"
 
 function JoinRoom() {
   const [roomCode, setRoomCode] = useState('');
@@ -71,35 +72,38 @@ function JoinRoom() {
   };
 
   return (
-    <div className="join-room-container">
-      <h2 className="join-title">Join a Room</h2>
-      <input
-        type="text"
-        placeholder="Enter Room Code"
-        className="retro-input"
-        value={roomCode}
-        onChange={(e) => setRoomCode(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Enter Your Name"
-        value={username}
-        className="retro-input"
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <select value={role} onChange={(e) => setRole(e.target.value)}>
-        <option value="Agent">Agent</option>
-        <option value="Spymaster">Spymaster</option>
-      </select>
-      <select value={team} onChange={(e) => setTeam(e.target.value)}>
-        <option value="Red">Red Team</option>
-        <option value="Blue">Blue Team</option>
-      </select>
-      {errorMessage && <p className="error-message">{errorMessage}</p>}
-      <button onClick={handleJoinRoom} disabled={loading} className="retro-button">
-        {loading ? 'Joining...' : 'Join Room'}
-      </button>
-    </div>
+    <>
+      <Header />
+      <div className="join-room-container">
+        <h2 className="join-title">Join a Room</h2>
+        <input
+          type="text"
+          placeholder="Enter Room Code"
+          className="retro-input"
+          value={roomCode}
+          onChange={(e) => setRoomCode(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Enter Your Name"
+          value={username}
+          className="retro-input"
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <select value={role} onChange={(e) => setRole(e.target.value)}>
+          <option value="Agent">Agent</option>
+          <option value="Spymaster">Spymaster</option>
+        </select>
+        <select value={team} onChange={(e) => setTeam(e.target.value)}>
+          <option value="Red">Red Team</option>
+          <option value="Blue">Blue Team</option>
+        </select>
+        {errorMessage && <p className="error-message">{errorMessage}</p>}
+        <button onClick={handleJoinRoom} disabled={loading} className="retro-button">
+          {loading ? 'Joining...' : 'Join Room'}
+        </button>
+      </div>
+    </>
   );
 }
 
