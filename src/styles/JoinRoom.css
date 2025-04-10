@@ -1,4 +1,10 @@
 /* Join Room Container */
+*{
+  overflow: hidden;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 .join-room-container {
   max-height: 100vh;
   display: flex;
