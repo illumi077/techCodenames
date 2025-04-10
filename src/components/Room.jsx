@@ -14,39 +14,45 @@ function Room() {
   const [timer, setTimer] = useState(0);
   const navigate = useNavigate();
 
-  // **Global Timer Sync Logic**
-  // **Global Timer Sync Logic**
   useEffect(() => {
+    let interval;
+  
     if (roomData?.gameState === "active" && roomData?.timerEndTime) {
-      const interval = setInterval(() => {
-        setTimer(Math.max(Math.floor((new Date(roomData.timerEndTime).getTime() - Date.now()) / 1000),0));
+      interval = setInterval(() => {
+        setTimer(Math.max(Math.floor((new Date(roomData.timerEndTime).getTime() - Date.now()) / 1000), 0));
       }, 1000);
-
-      return () => clearInterval(interval);
     }
+  
+    return () => clearInterval(interval); // ✅ Ensures no leftover timers interfere
   }, [roomData?.timerEndTime, roomData?.gameState]);
-
   
-  socket.on("turnSwitched", ({ currentTurnTeam, timerEndTime }) => {
-    console.log(`🔄 Turn switched! Updating timer: ${timerEndTime}`);
-
-    setTimeout(() => {
-      setRoomData((prevData) => ({
-        ...prevData,
-        currentTurnTeam,
-        timerEndTime,
-      }));
-    }, 200); // ✅ Buffer delay for stability
-  });
-
+  useEffect(() => {
+    socket.on("turnSwitched", ({ currentTurnTeam, timerEndTime }) => {
+      console.log(`🔄 Turn switched! Syncing timer update.`);
+      
+      setTimeout(() => {
+        setRoomData((prevData) => ({
+          ...prevData,
+          currentTurnTeam,
+          timerEndTime,
+          currentHint: "",
+          hintSubmitted: false,
+        }));
+      }, 200);
+    });
   
+    return () => {
+      socket.off("turnSwitched");
+    };
+  }, []);
+  
+
   useEffect(() => {
     socket.on("gameStartFailed", ({ message }) => alert(message));
 
     return () => socket.off("gameStartFailed");
   }, []);
 
-  
   useEffect(() => {
     socket.emit("joinRoom", roomCode);
 
@@ -115,9 +121,14 @@ function Room() {
         timerEndTime,
         gameState: "active",
       }));
-    });
-
     
+      // ✅ Schedule expiration immediately when game starts
+      setTimeout(() => {
+        socket.emit("requestTimerExpiration", { roomCode });
+      }, 500);
+    });
+    
+
     socket.on("turnSwitched", ({ currentTurnTeam, timerEndTime }) => {
       console.log(
         `🔄 Turn switched to ${currentTurnTeam}, Timer reset at: ${timerEndTime}`
@@ -186,7 +197,6 @@ function Room() {
     }, 150);
   };
 
-  
   useEffect(() => {
     socket.on("turnSwitched", ({ currentTurnTeam, timerEndTime }) => {
       console.log(`🔄 Turn switched! Syncing timer update.`);
@@ -195,7 +205,7 @@ function Room() {
           ...prevData,
           currentTurnTeam,
           timerEndTime,
-          currentHint: "",  // ✅ Clear hint to ensure re-render
+          currentHint: "", // ✅ Clear hint to ensure re-render
           hintSubmitted: false, // ✅ Reset submission state to prevent UI inconsistencies
         }));
       }, 2000);
@@ -209,38 +219,35 @@ function Room() {
   const handleStartGame = async () => {
     if (roomData.gameState === "active") {
       console.log("🚫 Game already active, ignoring extra start requests.");
-      return; 
+      return;
     }
-
+  
     try {
       const response = await fetch(`${backendUrl}/api/rooms/startGame`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ roomCode }),
       });
-
+  
       const data = await response.json();
-
-      // ✅ Ensure the request is actually processed before alerting
-      setTimeout(() => {
-        if (!response.ok) {
-          alert(data.error || "Failed to start the game.");
-        }
-      }, 500); // ✅ Small buffer delay before firing alert
-
+  
       if (response.ok) {
         console.log("🚀 Game started! Timer syncing...");
         setRoomData((prevData) => ({
           ...prevData,
-          timerEndTime: data.timerEndTime, 
+          timerEndTime: data.timerEndTime,
           gameState: "active",
         }));
+      } else {
+        setTimeout(() => {
+          alert(data.error || "Failed to start the game.");
+        }, 500);
       }
     } catch (error) {
       console.error("Error starting game:", error);
     }
-};
-
+  };
+  
 
   const handleLeaveRoom = async () => {
     const username = sessionStorage.getItem("username");
@@ -320,7 +327,6 @@ function Room() {
         )}
       </div>
 
-
       {/* ✅ Grid Rendering */}
       <div className="grid">
         {roomData.wordSet.map((word, index) => {
@@ -346,7 +352,7 @@ function Room() {
         roomCode={roomCode}
         currentTurnTeam={roomData.currentTurnTeam}
         currentPlayer={currentPlayer}
-        gameState={roomData.gameState} 
+        gameState={roomData.gameState}
       />
 
       <div className="player-list">
