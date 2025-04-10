@@ -1,10 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-*{
-  overflow: hidden;
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+
 /* General Reset */
 body {
   margin: 0;
@@ -42,15 +37,15 @@ h1, h2, p {
 }
 
 .retro-button:hover {
-  background-color: #d1345b; /* Retro red-pink for hover */
+  background-color: #d1345b; 
   color: white;
   text-shadow: none;
-  transform: scale(1.05); /* Slightly larger on hover */
+  transform: scale(1.05); 
 }
 
 .retro-button:active {
-  transform: translateY(0.125rem); /* Tactile press feedback */
-  box-shadow: 0 0.125rem black; /* Reduced shadow for pressed look */
-  background-color: #f9d342; /* Retain golden yellow */
+  transform: translateY(0.125rem); 
+  box-shadow: 0 0.125rem black; 
+  background-color: #f9d342; 
 }
 
