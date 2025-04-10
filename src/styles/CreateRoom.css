@@ -1,12 +1,14 @@
 /* Create Room Container */
 
 .create-room-container {
-  height: 100vh;
+  max-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  gap: 0.1rem;
   align-items: center;
-  background-color: #79b168; /* Retro green base */
+  padding: 1rem;
+  background-color: #79b168; /* Lush retro green base */
   background-image: 
     radial-gradient(circle, #6f9d44 12%, transparent 2%), 
     radial-gradient(circle, #a67c52 12%, transparent 2%), 
